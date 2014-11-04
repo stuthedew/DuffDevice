@@ -28,7 +28,8 @@
 #endif
 
 inline void duff(int rPtr[], int wPtr[]){
-   int n = (ARRAY_SIZE + 7) / 8;      /* ARRAY_SIZE > 0 assumed */
+   int n = (ARRAY_SIZE + 7);      /* ARRAY_SIZE > 0 assumed */
+   n >>= 3;
 
     switch (ARRAY_SIZE % 8)
     {
@@ -45,19 +46,24 @@ inline void duff(int rPtr[], int wPtr[]){
 
 }
 
-inline void duff(int rPtr[], int wPtr[]){
-   int n = (ARRAY_SIZE + 7) / 8;      /* ARRAY_SIZE > 0 assumed */
+inline void duff(const void* readBuf, void* writeBuf, uint8_t len){
+    
+   int n = (len + 7);      /* ARRAY_SIZE > 0 assumed */
+   n >>= 3;                /* n>>3 == n/8  bit shift is faster than divide*/ 
 
-    switch (ARRAY_SIZE % 8)
+    const uint8_t* readPtr = reinterpret_cast<const uint8_t*>(readBuf);
+    uint8_t* writePtr = reinterpret_cast<uint8_t*>(writeBuf);
+    
+    switch (len % 8)
     {
-        case 0:   do {    *wPtr++ = *rPtr++;
-        case 7:           *wPtr++ = *rPtr++;
-        case 6:           *wPtr++ = *rPtr++;
-        case 5:           *wPtr++ = *rPtr++;
-        case 4:           *wPtr++ = *rPtr++;
-        case 3:           *wPtr++ = *rPtr++;
-        case 2:           *wPtr++ = *rPtr++;
-        case 1:           *wPtr++ = *rPtr++;
+        case 0:   do {    *writePtr++ = *readPtr++;
+        case 7:           *writePtr++ = *readPtr++;
+        case 6:           *writePtr++ = *readPtr++;
+        case 5:           *writePtr++ = *readPtr++;
+        case 4:           *writePtr++ = *readPtr++;
+        case 3:           *writePtr++ = *readPtr++;
+        case 2:           *writePtr++ = *readPtr++;
+        case 1:           *writePtr++ = *readPtr++;
                   } while (--n > 0);
     }
 

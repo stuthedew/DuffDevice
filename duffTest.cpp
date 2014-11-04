@@ -73,6 +73,7 @@ int main(int argc, char *argv[]) {
 
             rPtr = readAry;
             wPtr = writeAry;
+            //duff(rPtr, wPtr, ARRAY_SIZE);
             duff(rPtr, wPtr);
 
         }
