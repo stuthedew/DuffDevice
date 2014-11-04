@@ -1,33 +1,9 @@
-#ifndef __STU_DUFFDEVICE_H__
-#define __STU_DUFFDEVICE_H__
-
-
-#if ARDUINO < 100
-#include <WProgram.h>
-#else
-#include <Arduino.h>
-#endif
-
-#include <stddef.h>
-
-// Stuff that is normally provided by Arduino
-#ifdef ARDUINO
-
-#else
-#include <stdint.h>
+#include <iostream>
 #include <stdio.h>
-#include <string.h>
-#endif
+#include <assert.h>
 
-#undef SERIAL_DEBUG
-#ifdef SERIAL_DEBUG
-#define IF_SERIAL_DEBUG(x) ({x;})
-#else
-#define IF_SERIAL_DEBUG(x)
-#endif
-
-
-
+#define ARRAY_SIZE 10
+using namespace std;
 int writeAry[ARRAY_SIZE];
 
 int readAry[ARRAY_SIZE];
