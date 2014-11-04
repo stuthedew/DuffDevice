@@ -2,35 +2,37 @@
 #include <stdio.h>
 #include <assert.h>
 #include "stu_duffdevice.h"
-#define ARRAY_SIZE 10
+#undef ARRAY_SIZE
+#define ARRAY_SIZE 100
+
 using namespace std;
 
 
-int writeAry[ARRAY_SIZE];
+int writeAry;
 
 int readAry[ARRAY_SIZE];
 
 
 
-void loopUnroll(int rPtr[], int wPtr[]){
+void loopUnroll(int rPtr[], int *wPtr){
 
     // Handle copy as much as we can with unrolling
     int loopCycles = (ARRAY_SIZE + 4) / 5;
 
     for (int i = 0; i < loopCycles; ++i)
     {
-        *wPtr++ = *rPtr++;
-        *wPtr++ = *rPtr++;
-        *wPtr++ = *rPtr++;
-        *wPtr++ = *rPtr++;
-        *wPtr++ = *rPtr++;
+        *wPtr = *rPtr++;
+        *wPtr = *rPtr++;
+        *wPtr = *rPtr++;
+        *wPtr = *rPtr++;
+        *wPtr = *rPtr++;
     }
 
 
     // Take care of the remainder memory to copy
     for (int j=0; j < ARRAY_SIZE % 5; ++j)
     {
-        *wPtr++ = *rPtr++;
+        *wPtr = *rPtr++;
 
     }
 }
@@ -39,6 +41,8 @@ void loopUnroll(int rPtr[], int wPtr[]){
 
 clock_t t = 0;
 clock_t runTime;
+unsigned int nTime = 0;
+unsigned int dTime = 0;
 
 int main(int argc, char *argv[]) {
     cout << endl << "Stuart's Duff device implementation test" << endl;
@@ -47,42 +51,50 @@ int main(int argc, char *argv[]) {
        readAry[i] = random() % 1000;
 
     }
+
      int *rPtr = readAry;
-     int *wPtr = writeAry;
+     int *wPtr = &writeAry;
     runTime = clock();
-    for(unsigned int i = 0; i < 500000; i++){
+    for(unsigned int j = 0; j < 500000; j++){
 
         rPtr = readAry;
-        wPtr = writeAry;
-        runTime = clock();
+        wPtr = &writeAry;
     loopUnroll(rPtr, wPtr);
-    t += clock() - runTime;
+    
+    
+     //assert(readAry[ARRAY_SIZE - 1] == writeAry);
     }
-   
+nTime = clock() - runTime;   
 
+/*
     for(int i = 0; i < ARRAY_SIZE; i++){
         assert(readAry[i] == writeAry[i]);
-    }
-    unsigned int nTime = t;
+    }*/
+
     cout << endl << "Naive: " << nTime << " clock ticks" << endl;
 
-    t = 0;
-           runTime = clock();
 
-        for(unsigned int i = 0; i < 500000; i++){
+           
+runTime = clock();
+        for(unsigned int j = 0; j < 500000; j++){
 
             rPtr = readAry;
-            wPtr = writeAry;
-            //duff(rPtr, wPtr, ARRAY_SIZE);
-            duff(rPtr, wPtr);
+            wPtr = &writeAry;
+            
+            duff(rPtr, wPtr, ARRAY_SIZE);
+            //duff(rPtr, wPtr);
+            
 
+//            assert(readAry[ARRAY_SIZE - 1] == writeAry);
         }
-
-        t += clock() - runTime;
+dTime = clock() - runTime;
+assert(readAry[ARRAY_SIZE - 1] == writeAry);
+        /*
         for(int i = 0; i < ARRAY_SIZE; i++){
                     assert(readAry[i] == writeAry[i]);
                 }
-        unsigned int dTime = t;
+                */
+
         cout << "Duff: " << dTime << " clock ticks" << endl;
         double improve = (nTime - dTime);
 
